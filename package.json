@@ -1,4 +1,33 @@
-﻿{
+﻿# fix-windows.ps1 - 修复 Vercel 部署的 PowerShell 脚本
+Write-Host "🎯 开始修复 Vercel 部署问题..." -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Cyan
+
+# 1. 备份原文件
+Write-Host "📦 备份原文件..." -ForegroundColor Yellow
+Copy-Item -Force package.json package.json.backup -ErrorAction SilentlyContinue
+Copy-Item -Force index.html index.html.backup -ErrorAction SilentlyContinue
+
+# 2. 删除 TypeScript 配置文件
+Write-Host "🗑️ 删除 TypeScript 配置文件..." -ForegroundColor Yellow
+Remove-Item -Force tsconfig.json -ErrorAction SilentlyContinue
+Remove-Item -Force tsconfig.node.json -ErrorAction SilentlyContinue
+Remove-Item -Force tsconfig.app.json -ErrorAction SilentlyContinue
+Remove-Item -Force tsconfig.vitest.json -ErrorAction SilentlyContinue
+Remove-Item -Force vitest.config.ts -ErrorAction SilentlyContinue
+Remove-Item -Force src\env.d.ts -ErrorAction SilentlyContinue
+Remove-Item -Force src\vite-env.d.ts -ErrorAction SilentlyContinue
+
+# 3. 处理 main.js 文件
+Write-Host "🔧 处理 main.js 文件..." -ForegroundColor Yellow
+if (Test-Path "src\main.ts") {
+    Rename-Item "src\main.ts" "src\main.js"
+    Write-Host "  已将 main.ts 重命名为 main.js" -ForegroundColor Green
+}
+
+# 4. 创建新的 package.json
+Write-Host "📝 创建新的 package.json..." -ForegroundColor Yellow
+@'
+{
   "name": "wish-wall-website",
   "version": "0.0.0",
   "type": "module",
